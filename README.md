@@ -66,14 +66,3 @@
 | **Open-Meteo** | 항구별 72시간 파고 · 풍속 · 시정 예보 |
 | **국립해양조사원** | 항만 CCTV 영상 (무역항 31곳 중 11곳 제공) |
 | **OpenStreetMap** | 해안선 — 바다 격자를 만드는 원본 · 지도 타일 |
-
----
-
-## ⚙️ 실행 방법
-
-```bash
-mysql -u user -p navigate < Navigate/sql/ports.sql
-cd Navigate && ./gradlew bootRun
-```
-
-DB 접속 정보와 API 인증키(`MTIS_KEY` · `CCTV_BASE`)는 `Navigate/.env` 로 관리합니다.
