@@ -14,7 +14,7 @@
 | 구분 | 내용 |
 | --- | --- |
 | 팀·기간 | Hello_World 4인 · 2026.10.17 ~ 11.12 (4주) |
-| **내 담당** | **`route` 패키지 전체 — 격자 제작부터 화면에 그리기까지 (약 1,450줄)** |
+| **내 담당** | **`route` 패키지 전체 — 격자 제작부터 화면에 그리기까지** |
 | 기술 | Java 17 · Spring Boot · MyBatis · MariaDB · Leaflet · Python(numpy) |
 | 원본 저장소 | [`ung-Jin/Navigate`](https://github.com/ung-Jin/Navigate) 의 fork · [내 커밋](https://github.com/ung-Jin/Navigate/commits/dev?author=rlawns2848-hue) |
 | 작업일지 | [Notion](https://scratched-ceramic-15c.notion.site/40090bcc7b0780409d99e0e6757d8e30) |
@@ -26,11 +26,11 @@
 
 | | 하는 일 | 파일 |
 | --- | --- | --- |
-| **바다 격자** | 해안선을 500m 칸으로 자르고, 큰 바다와 끊긴 만을 걸러냄 | [`SeaGrid`](Navigate/src/main/java/com/green/Navigate/route/service/SeaGrid.java) 295줄 |
-| **위험도 조립** | 교통·사고위험 예보·기상을 각각 0~1 로 맞춰 칸마다 한 점수로 | [`RiskMap`](Navigate/src/main/java/com/green/Navigate/route/service/RiskMap.java) 287줄 |
-| **경로 탐색** | A\* · 대각선 통과 제한 · 계단 경로를 직선으로 펴기 | [`AStar`](Navigate/src/main/java/com/green/Navigate/route/service/AStar.java) 343줄 |
-| **최소·안전 경로** | 같은 A\* 를 α만 바꿔 두 번 · 거리/시간/위험 측정 · 캐싱 | [`RouteService`](Navigate/src/main/java/com/green/Navigate/route/service/RouteService.java) 296줄 |
-| **화면** | 지도에 두 경로를 그리고 거리·시간·위험을 비교표로 | [`route.js`](Navigate/src/main/resources/static/js/route.js) 212줄 |
+| **바다 격자** | 해안선을 500m 칸으로 자르고, 큰 바다와 끊긴 만을 걸러냄 | [`SeaGrid`](Navigate/src/main/java/com/green/Navigate/route/service/SeaGrid.java) |
+| **위험도 조립** | 교통·사고위험 예보·기상을 각각 0~1 로 맞춰 칸마다 한 점수로 | [`RiskMap`](Navigate/src/main/java/com/green/Navigate/route/service/RiskMap.java) |
+| **경로 탐색** | A\* · 대각선 통과 제한 · 계단 경로를 직선으로 펴기 | [`AStar`](Navigate/src/main/java/com/green/Navigate/route/service/AStar.java) |
+| **최소·안전 경로** | 같은 A\* 를 α만 바꿔 두 번 · 거리/시간/위험 측정 · 캐싱 | [`RouteService`](Navigate/src/main/java/com/green/Navigate/route/service/RouteService.java) |
+| **화면** | 지도에 두 경로를 그리고 거리·시간·위험을 비교표로 | [`route.js`](Navigate/src/main/resources/static/js/route.js) |
 
 <details><summary>팀원 담당</summary>
 
@@ -44,9 +44,12 @@
 
 ## 화면
 
-![경로 탐색 — 울산항 → 목포항](docs/route-screen.png)
+![경로 탐색 — 군산항 → 제주항](docs/route-screen.png)
 
-회색 점선이 최소경로, 파란 실선이 안전경로입니다. 왼쪽에서 거리·시간·위험 노출을 나란히 비교합니다.
+회색 점선이 최소경로, 파란 실선이 안전경로입니다. 노랑·주황·빨강 칸이 위험도입니다.
+
+최소경로는 완도항 앞의 붉은 칸을 그대로 지나가고, 안전경로는 그 서쪽으로 비켜 갑니다.
+**12km(3.8%) 더 돌아가는 대신 위험 노출이 25.2 → 14.0 으로 44.4% 줄었습니다.** 시간은 30분 늘었습니다.
 
 ## 핵심 코드
 
@@ -79,6 +82,11 @@
 
 ## 결과
 
+![A* 와 다익스트라가 살펴본 칸](docs/astar-vs-dijkstra.png)
+
+부산항 → 목포항에서 **두 알고리즘이 실제로 살펴본 칸**입니다 (주황색). 찾아낸 경로는 같지만,
+A\* 는 93,375칸만 보고 0.82초, 다익스트라는 413,890칸을 보고 3.24초 걸렸습니다.
+
 무역항 31곳 중 내륙인 서울항을 뺀 30곳의 모든 조합(435쌍)을 전부 돌린 결과입니다.
 
 | 항목 | 결과 |
@@ -110,12 +118,7 @@
 1. **내가 만든 기준으로 검증하면 언제나 통과합니다.** 2.5km 격자로 435쌍을 돌려 육지 통과 0건이 나왔는데, 채점에 쓴 자가 제가 만든 그 격자였습니다. 110m 해안선으로 다시 재니 3~16% 가 육지 위였습니다.
 2. **높은 점수가 잘한 게 아니었습니다.** 정확도 77.3% 는 전부 무사고로 찍어도 나오는 점수였습니다.
 3. **기준이 없는 값도 근거를 만들 수 있습니다.** 가중치는 어디에도 기준이 없어 감으로 정했는데, 사고다발 26칸을 정답지로 삼아 11가지 조합을 채점해 골랐습니다.
-
-## 프로젝트 시리즈
-
-[1차 AS기사 스케줄 관리](https://github.com/rlawns2848-hue/Schedule) · [2차 전력사용량 예측 대시보드](https://github.com/rlawns2848-hue/Predict) · **3차 해상교통 안전경로 예측 (이 저장소)**
-
-실시간 선박은 **10분마다**, 항구 기상은 **30분마다** 받아 메모리에만 둡니다.
+ 메모리에만 둡니다.
 
 사고위험·혼잡 예보는 **3시간 간격**으로 나옵니다. 같은 구간이면 그날 처음 한 번만 받아 다시 사용합니다.
 
